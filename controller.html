@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Map Ban Controller</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      color: black;
+      padding: 20px;
+    }
+
+    .map-controls {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+
+    button,
+    select {
+      margin-left: 5px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      padding-top: 10px;
+    }
+
+    button {
+      width: 200px;
+    }
+  </style>
+</head>
+
+<body style="background-color: dimgrey;">
+  <h1>Map Ban Controller</h1>
+
+  <label>
+    Team A Name:
+    <input type="text" id="teamA" value="Team A">
+  </label>
+  <label>
+    Team B Name:
+    <input type="text" id="teamB" value="Team B">
+  </label>
+
+  <label>
+    Team A Color:
+    <input type="color" id="colorA" value="#ff0000">
+  </label>
+  <label>
+    Team B Color:
+    <input type="color" id="colorB" value="#0000ff">
+  </label>
+
+  <div>
+    <label for="mapSelect">Select Map:</label>
+    <select id="mapSelect"></select>
+  </div>
+  <div>
+    <label>Ban Choice</label>
+    <button onclick="sendAction('ban', getSelectedMap(), 'teamA')">Ban (Team A)</button>
+    <button onclick="sendAction('ban', getSelectedMap(), 'teamB')">Ban (Team B)</button>
+  </div>
+  <div>
+    <label>Team Map Pick</label>
+    <button onclick="sendAction('pick', getSelectedMap(), 'teamA')">Pick (Team A)</button>
+    <button onclick="sendAction('pick', getSelectedMap(), 'teamB')">Pick (Team B)</button>
+  </div>
+  <div>
+    <label>Team A side select</label>
+    <button onclick="sendSide(getSelectedMap(), 'attack', 'teamA')">Attack (Team A)</button>
+    <button onclick="sendSide(getSelectedMap(), 'defend', 'teamA')">Defend (Team A)</button>
+  </div>
+  <div>
+    <label>Team B side select</label>
+    <button onclick="sendSide(getSelectedMap(), 'attack', 'teamB')">Attack (Team B)</button>
+    <button onclick="sendSide(getSelectedMap(), 'defend', 'teamB')">Defend (Team B)</button>
+  </div>
+  <div>
+    <label></label>
+    <button onclick="resetAll()">Reset</button>
+  </div>
+
+  <script>
+    const maps = ["Ascent", "Bind", "Haven", "Icebox", "Lotus", "Split", "Sunset"];
+    const remainingMaps = new Set(maps);
+    // Fixed: Connect to port 3000 instead of 3001
+    const socket = new WebSocket("ws://localhost:3000");
+
+    socket.addEventListener("open", () => {
+      console.log("WebSocket connection established");
+    });
+
+    socket.addEventListener("error", (error) => {
+      console.error("WebSocket error:", error);
+    });
+
+    socket.addEventListener("close", () => {
+      console.log("WebSocket connection closed");
+    });
+
+    const mapSelect = document.getElementById("mapSelect");
+    function updateDropdown() {
+      mapSelect.innerHTML = "";
+      remainingMaps.forEach(map => {
+        const option = document.createElement("option");
+        option.value = map;
+        option.textContent = map;
+        mapSelect.appendChild(option);
+      });
+    }
+    updateDropdown();
+
+    function getSelectedMap() {
+      return mapSelect.value;
+    }
+
+    function sendAction(action, map, teamKey) {
+      const team = document.getElementById(teamKey).value;
+      const color = document.getElementById(teamKey === "teamA" ? "colorA" : "colorB").value;
+      if (action === "ban") {
+        remainingMaps.delete(map);
+        updateDropdown();
+      }
+      const message = { action, map, team, color };
+      socket.send(JSON.stringify(message));
+      console.log("Sending action:", message);
+    }
+
+    function sendSide(map, side, teamKey) {
+      const team = document.getElementById(teamKey).value;
+      remainingMaps.delete(map);
+      updateDropdown();
+      const message = { action: "side", map, team, side };
+      socket.send(JSON.stringify(message));
+      console.log("Sending side:", message);
+    }
+
+    function resetAll() {
+      // Reset Teams and colors
+      document.getElementById("teamA").value = "Team A";
+      document.getElementById("teamB").value = "Team B";
+      document.getElementById("colorA").value = "#ff0000";
+      document.getElementById("colorB").value = "#0000ff";
+
+      // Reset Maps
+      remainingMaps.clear();
+      maps.forEach(map => remainingMaps.add(map));
+      updateDropdown();
+
+      //Notify overlay to reset
+      socket.send(JSON.stringify({ action: "reset" }));
+      console.log("Sending reset");
+    }
+  </script>
+</body>
+
+</html>
+
+<!--<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Map Ban Controller</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      color: black;
+      padding: 20px;
+    }
+
+    .map-controls {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+
+    button,
+    select {
+      margin-left: 5px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      padding-top: 10px;
+    }
+
+    button {
+      width: 200px;
+    }
+  </style>
+</head>
+
+<body style="background-color: dimgrey;">
+  <h1>Map Ban Controller</h1>
+
+  <label>
+    Team A Name:
+    <input type="text" id="teamA" value="Team A">
+  </label>
+  <label>
+    Team B Name:
+    <input type="text" id="teamB" value="Team B">
+  </label>
+
+  <label>
+    Team A Color:
+    <input type="color" id="colorA" value="#ff0000">
+  </label>
+  <label>
+    Team B Color:
+    <input type="color" id="colorB" value="#0000ff">
+  </label>
+
+  <div>
+    <label for="mapSelect">Select Map:</label>
+    <select id="mapSelect"></select>
+  </div>
+  <div>
+    <label>Ban Choice</label>
+    <button onclick="sendAction('ban', getSelectedMap(), 'teamA')">Ban (Team A)</button>
+    <button onclick="sendAction('ban', getSelectedMap(), 'teamB')">Ban (Team B)</button>
+  </div>
+  <div>
+    <label>Team Map Pick</label>
+    <button onclick="sendAction('pick', getSelectedMap(), 'teamA')">Pick (Team A)</button>
+    <button onclick="sendAction('pick', getSelectedMap(), 'teamB')">Pick (Team B)</button>
+  </div>
+  <div>
+    <label>Team A side select</label>
+    <button onclick="sendSide(getSelectedMap(), 'attack', 'teamA')">Attack (Team A)</button>
+    <button onclick="sendSide(getSelectedMap(), 'defend', 'teamA')">Defend (Team A)</button>
+  </div>
+  <div>
+    <label>Team B side select</label>
+    <button onclick="sendSide(getSelectedMap(), 'attack', 'teamB')">Attack (Team B)</button>
+    <button onclick="sendSide(getSelectedMap(), 'defend', 'teamB')">Defend (Team B)</button>
+  </div>
+  <div>
+    <label></label>
+    <button onclick="resetAll()">Reset</button>
+  </div>
+
+  <script>
+    const maps = ["Ascent", "Bind", "Haven", "Icebox", "Lotus", "Split", "Sunset"];
+    const remainingMaps = new Set(maps);
+    const socket = new WebSocket("ws://localhost:3001");
+
+    socket.addEventListener("open", () => {
+      console.log("WebSocket connection established");
+    });
+
+
+    const mapSelect = document.getElementById("mapSelect");
+    function updateDropdown() {
+      mapSelect.innerHTML = "";
+      remainingMaps.forEach(map => {
+        const option = document.createElement("option");
+        option.value = map;
+        option.textContent = map;
+        mapSelect.appendChild(option);
+      });
+    }
+    updateDropdown();
+
+    function getSelectedMap() {
+      return mapSelect.value;
+    }
+
+    function sendAction(action, map, teamKey) {
+      const team = document.getElementById(teamKey).value;
+      const color = document.getElementById(teamKey === "teamA" ? "colorA" : "colorB").value;
+      if (action === "ban") {
+        remainingMaps.delete(map);
+        updateDropdown();
+      }
+      socket.send(JSON.stringify({ action, map, team, color }));
+      console.log("Sending action:", { action, map, team, color });
+    }
+
+    function sendSide(map, side, teamKey) {
+      const team = document.getElementById(teamKey).value;
+      remainingMaps.delete(map);
+      updateDropdown();
+      socket.send(JSON.stringify({ action: "side", map, team, side }));
+    }
+
+    function resetAll() {
+      // Reset Teams and colors
+      document.getElementById("teamA").value = "Team A";
+      document.getElementById("teamB").value = "Team B";
+      document.getElementById("colorA").value = "#ff0000";
+      document.getElementById("colorB").value = "#0000ff";
+
+      // Reset Maps
+      remainingMaps.clear();
+      maps.forEach(map => remainingMaps.add(map));
+      updateDropdown();
+
+      //Norify overlay to reset
+      socket.send(JSON.stringify({ action: "reset" }));
+    }
+  </script>
+</body>
+
+</html> -->
