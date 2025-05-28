@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -35,7 +34,7 @@
 
     // Fixed: Connect to port 3000 instead of 3001
     const socket = new WebSocket("ws://localhost:3000");
-    
+
     socket.addEventListener("open", () => {
       console.log("Overlay WebSocket connection established");
     });
@@ -56,7 +55,7 @@
 
       const data = JSON.parse(rawData);
       console.log("Received data:", data);
-      
+
       if (data.action === "reset") {
         location.reload();
         return;
@@ -89,83 +88,3 @@
 </body>
 
 </html>
-<!--<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Valorant Map Overlay</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-
-<body>
-  <div class="overlay-grid" id="map-grid"></div>
-
-  <script>
-    const maps = ["Ascent", "Bind", "Haven", "Icebox", "Lotus", "Split", "Sunset"];
-    const mapGrid = document.getElementById("map-grid");
-
-    maps.forEach((map) => {
-      const card = document.createElement("div");
-      card.className = "map-card";
-      card.id = `map-${map}`;
-      card.dataset.color = "";
-
-      card.innerHTML = `
-        <div class="label">${map}</div>
-        <img src="images/${map}.jpg" alt="\${map}">
-        <div class="ban-label" id="${map}-ban"></div>
-        <div class="pick-label" id="${map}-pick"></div>
-        <div class="side-label" id="${map}-side"></div>
-      `;
-
-      mapGrid.appendChild(card);
-    });
-
-    const socket = new WebSocket("ws://localhost:3001");
-    console.log(socket)
-    socket.addEventListener("message", async (event) => {
-      console.log(message)
-      let rawData = event.data;
-      if (rawData instanceof Blob) {
-        rawData = await rawData.text();
-      }
-
-      const data = JSON.parse(rawData);
-      console.log("Received data:", data);
-      console.log(data.action);
-      if (data.action === "reset") {
-        location.reload()
-      }
-      const mapCard = document.getElementById(`map-${data.map}`);
-      //console.log(mapCard)
-      if (!mapCard) {
-        return;
-      }
-
-
-
-      if (data.action === "ban") {
-        mapCard.classList.add("banned");
-        document.getElementById(`${data.map}-ban`).textContent = `${data.team} BANNED`;
-      }
-
-      if (data.action === "pick") {
-        document.getElementById(`${data.map}-pick`).textContent = `${data.team} PICKED`;
-      }
-
-      if (data.action === "side") {
-        document.getElementById(`${data.map}-side`).textContent = `${data.team} → ${data.side.toUpperCase()}`;
-      }
-
-      if (data.color) {
-        mapCard.style.setProperty("--team-color", data.color);
-      }
-
-
-    });
-  </script>
-</body>
-
-</html> -->
