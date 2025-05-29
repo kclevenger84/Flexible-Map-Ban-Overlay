@@ -4,6 +4,14 @@ const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 module.exports = {
   packagerConfig: {
     asar: true,
+    name: 'Valorant Map Ban Overlay',
+    executableName: 'valorant-map-ban',
+    appBundleId: 'com.kclevenger.valorant-map-ban',
+    appVersion: '0.0.1',
+    buildVersion: '0.0.1',
+    icon: './assests/icon.ico',
+
+    extraResource: ['./overlay.html', './style.css', './images']
   },
   rebuildConfig: {},
   makers: [

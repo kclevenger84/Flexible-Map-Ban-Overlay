@@ -1,7 +1,7 @@
 {
   "name": "valorant-map-ban-overlay",
   "productName": "Valorant Map Ban Overlay",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A map ban/pick overlay for Valorant tournaments",
   "main": "main.js",
   "scripts": {
