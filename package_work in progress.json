@@ -1,8 +1,8 @@
 {
-  "name": "valorant-map-ban-overlay",
-  "productName": "Valorant Map Ban Overlay",
+  "name": "flexible-map-ban-overlay",
+  "productName": "Flexible Map Ban Overlay",
   "version": "0.0.1",
-  "description": "A map ban/pick overlay for Valorant tournaments",
+  "description": "A map ban/pick overlay for Valorant and Overwatch 2 tournaments",
   "main": "main.js",
   "homepage": "./",
   "scripts": {
@@ -17,8 +17,8 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "build": {
-    "appId": "com.kclevenger.valorant-map-ban",
-    "productName": "Valorant Map Ban Overlay",
+    "appId": "com.KnoxGameTeacher.flexible-map-ban",
+    "productName": "Flexible Map Ban Overlay",
     "directories": {
       "output": "dist"
     },
@@ -88,7 +88,7 @@
       "allowElevation": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Valorant Map Ban Overlay",
+      "shortcutName": "Flexible Map Ban Overlay",
       "runAfterFinish": true,
       "menuCategory": "Games",
       "installerIcon": "assets/icon.ico",
@@ -106,10 +106,11 @@
   },
   "keywords": [
     "valorant",
+    "overwatch",
     "esports",
     "overlay",
     "streaming"
   ],
-  "author": "Kevin Clevenger",
+  "author": "Kevin Clevenger with contributions from Antonia Lucas",
   "license": "MIT"
 }
