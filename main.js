@@ -25,10 +25,12 @@ const createWindow = () => {
         width: 500,
         height: 750,
         webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
+            //nodeIntegration: true,
+            //contextIsolation: false,
+            preload: path.join(__dirname, 'preload.js'), // Use preload script for security
         },
     });
+    mainWindow.loadFile('index.html');
 
     const controllerPath = isDev
         ? path.join(__dirname, 'controller.html')
