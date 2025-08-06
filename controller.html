@@ -37,6 +37,23 @@
 <body style="background-color: dimgrey;">
   <h1>Map Ban Controller</h1>
 
+  <label for="gameSelect">Select Game:</label>
+  <select id="gameSelect">
+    <option value="valorant">Valorant</option>
+    <option value="overwatch2">Overwatch 2</option>
+  </select>
+
+  <div id="ow2CategoryDiv" style="display:none;">
+  <label for="ow2CategorySelect">Select Overwatch 2 Map Type:</label>
+  <select id="ow2CategorySelect">
+    <option value="control">Control</option>
+    <option value="escort">Escort</option>
+    <option value="hybrid">Hybrid</option>
+    <option value="push">Push</option>
+    <option value="flashpoint">Flashpoint</option>
+  </select>
+</div>
+
   <label>
     Team A Name:
     <input type="text" id="teamA" value="Team A">
@@ -83,11 +100,25 @@
     <label></label>
     <button onclick="resetAll()">Reset</button>
   </div>
+  <div>
+    <label>Need Help?</label>
+    <a href="https://github.com/KnoxGameTeacher/Flexible-Map-Ban-Overlay/blob/main/README.md" target="_blank">Click here for the Read Me</a>
+  </div>
 
   <script>
-    const maps = ["Ascent", "Bind", "Haven", "Icebox", "Lotus", "Split", "Sunset"];
-    const remainingMaps = new Set(maps);
-    // Fixed: Connect to port 3000 instead of 3001
+    // Map pools for both games
+    const valorantMaps = ["Ascent", "Bind", "Haven", "Icebox", "Lotus", "Split", "Sunset"];
+    const ow2Maps = {
+      control: ["Antarctic Peninsula", "Busan", "Ilios", "Lijiang Tower", "Nepal", "Oasis", "Samoa"],
+      escort: ["Circuit Royal", "Dorado", "Havana", "Junkertown", "Rialto", "Route 66", "Shambali Monastery", "Gibraltar"],
+      hybrid: ["Blizzard World", "Eichenwalde", "Hollywood", "King's Row", "Midtown", "Numbani", "Paraiso"],
+      push: ["Colosseo", "Esperanca", "New Queen Street", "Runasapi"],
+      flashpoint: ["Aatlis", "Suravasa", "New Junk City"]
+    };
+
+    let currentGame = "valorant";
+    let currentCategory = "control";
+    let remainingMaps = new Set(valorantMaps);
     const socket = new WebSocket("ws://localhost:3000");
 
     socket.addEventListener("open", () => {
@@ -103,6 +134,10 @@
     });
 
     const mapSelect = document.getElementById("mapSelect");
+    const gameSelect = document.getElementById("gameSelect");
+    const ow2CategoryDiv = document.getElementById("ow2CategoryDiv");
+    const ow2CategorySelect = document.getElementById("ow2CategorySelect");
+
     function updateDropdown() {
       mapSelect.innerHTML = "";
       remainingMaps.forEach(map => {
@@ -112,6 +147,37 @@
         mapSelect.appendChild(option);
       });
     }
+
+    function setMapPool() {
+      if (currentGame === "valorant") {
+        remainingMaps = new Set(valorantMaps);
+      } else {
+        remainingMaps = new Set(ow2Maps[currentCategory]);
+      }
+    updateDropdown();
+    }
+
+    // Show/hide OW2 category selector and update map pool on game change
+    gameSelect.addEventListener("change", function () {
+      currentGame = gameSelect.value;
+      if (currentGame === "overwatch2") {
+        ow2CategoryDiv.style.display = "block";
+        currentCategory = ow2CategorySelect.value;
+      } else {
+        ow2CategoryDiv.style.display = "none";
+      }
+      setMapPool();
+      // Notify overlay of game/category change
+      socket.send(JSON.stringify({ action: "switch", game: currentGame, category: currentCategory }));
+    });
+
+    // Update map pool when OW2 category changes
+    ow2CategorySelect.addEventListener("change", function () {
+      currentCategory = ow2CategorySelect.value;
+      setMapPool();
+      socket.send(JSON.stringify({ action: "switch", game: currentGame, category: currentCategory }));
+    });
+
     updateDropdown();
 
     function getSelectedMap() {
@@ -125,7 +191,7 @@
         remainingMaps.delete(map);
         updateDropdown();
       }
-      const message = { action, map, team, color };
+      const message = { action, map, team, color, game: currentGame, category: currentCategory };
       socket.send(JSON.stringify(message));
       console.log("Sending action:", message);
     }
@@ -134,7 +200,7 @@
       const team = document.getElementById(teamKey).value;
       remainingMaps.delete(map);
       updateDropdown();
-      const message = { action: "side", map, team, side };
+      const message = { action: "side", map, team, side, game: currentGame, category: currentCategory };
       socket.send(JSON.stringify(message));
       console.log("Sending side:", message);
     }
@@ -147,12 +213,10 @@
       document.getElementById("colorB").value = "#0000ff";
 
       // Reset Maps
-      remainingMaps.clear();
-      maps.forEach(map => remainingMaps.add(map));
-      updateDropdown();
+      setMapPool();
 
-      //Notify overlay to reset
-      socket.send(JSON.stringify({ action: "reset" }));
+      // Notify overlay to reset
+      socket.send(JSON.stringify({ action: "reset", game: currentGame, category: currentCategory }));
       console.log("Sending reset");
     }
   </script>
