@@ -1,6 +1,6 @@
 {
     "appId": "com.kclevenger.valorant-map-ban",
-    "productName": "Valorant Map Ban Overlay",
+    "productName": "Flexible Map Ban Overlay",
     "directories": {
         "output": "dist"
     },
