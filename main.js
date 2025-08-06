@@ -22,7 +22,7 @@ const getResourcePath = (relativePath) => {
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
-        width: 500,
+        width: 600,
         height: 750,
         webPreferences: {
             //nodeIntegration: true,
