@@ -44,15 +44,15 @@
   </select>
 
   <div id="ow2CategoryDiv" style="display:none;">
-  <label for="ow2CategorySelect">Select Overwatch 2 Map Type:</label>
-  <select id="ow2CategorySelect">
-    <option value="control">Control</option>
-    <option value="escort">Escort</option>
-    <option value="hybrid">Hybrid</option>
-    <option value="push">Push</option>
-    <option value="flashpoint">Flashpoint</option>
-  </select>
-</div>
+    <label for="ow2CategorySelect">Select Overwatch 2 Map Type:</label>
+    <select id="ow2CategorySelect">
+      <option value="control">Control</option>
+      <option value="escort">Escort</option>
+      <option value="hybrid">Hybrid</option>
+      <option value="push">Push</option>
+      <option value="flashpoint">Flashpoint</option>
+    </select>
+  </div>
 
   <label>
     Team A Name:
@@ -102,12 +102,13 @@
   </div>
   <div>
     <label>Need Help?</label>
-    <a href="https://github.com/KnoxGameTeacher/Flexible-Map-Ban-Overlay/blob/main/README.md" target="_blank">Click here for the Read Me</a>
+    <a href="https://github.com/KnoxGameTeacher/Flexible-Map-Ban-Overlay/blob/main/README.md" target="_blank">Click here
+      for the Read Me</a>
   </div>
 
   <script>
     // Map pools for both games
-    const valorantMaps = ["Ascent", "Bind", "Haven", "Icebox", "Lotus", "Split", "Sunset"];
+    const valorantMaps = ["Ascent", "Bind", "Corrode", "Haven", "Icebox", "Lotus", "Sunset"];
     const ow2Maps = {
       control: ["Antarctic Peninsula", "Busan", "Ilios", "Lijiang Tower", "Nepal", "Oasis", "Samoa"],
       escort: ["Circuit Royal", "Dorado", "Havana", "Junkertown", "Rialto", "Route 66", "Shambali Monastery", "Gibraltar"],
@@ -154,7 +155,7 @@
       } else {
         remainingMaps = new Set(ow2Maps[currentCategory]);
       }
-    updateDropdown();
+      updateDropdown();
     }
 
     // Show/hide OW2 category selector and update map pool on game change
