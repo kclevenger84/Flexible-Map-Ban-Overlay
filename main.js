@@ -61,8 +61,12 @@ const createServer = () => {
             filePath = path.join(appDir, "controller.html");
         } else if (req.url === "/overlay.html") {
             filePath = path.join(appDir, "overlay.html");
+        } else if (req.url === "/overlay_full.html") {
+            filePath = path.join(appDir, "overlay_full.html");
         } else if (req.url.startsWith('/style.css')) {
             filePath = path.join(appDir, "style.css");
+        } else if (req.url.startsWith('/style2.css')) {
+            filePath = path.join(appDir, '/style2.css');
         } else if (req.url.startsWith('/images/')) {
             // Try both locations for images
             const imagePath1 = path.join(appDir, req.url);
