@@ -168,7 +168,7 @@
         ow2CategoryDiv.style.display = "none";
       }
       setMapPool();
-      // Notify overlay of game/category change
+      // Notify of game/category change
       socket.send(JSON.stringify({ action: "switch", game: currentGame, category: currentCategory }));
     });
 
