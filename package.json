@@ -1,7 +1,7 @@
 {
   "name": "flexible-map-ban-overlay",
   "productName": "Flexible Map Ban Overlay",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A map ban/pick overlay for Valorant and Overwatch tournaments",
   "main": "main.js",
   "homepage": "https://github.com/kclevenger84/Flexible-Map-Ban-Overlay",
