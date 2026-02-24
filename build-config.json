@@ -1,5 +1,5 @@
 {
-    "appId": "com.kclevenger.valorant-map-ban",
+    "appId": "com.kclevenger.flexible-map-ban",
     "productName": "Flexible Map Ban Overlay",
     "directories": {
         "output": "dist"

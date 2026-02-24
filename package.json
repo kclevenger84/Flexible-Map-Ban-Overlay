@@ -1,10 +1,10 @@
 {
   "name": "flexible-map-ban-overlay",
   "productName": "Flexible Map Ban Overlay",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "A map ban/pick overlay for Valorant and Overwatch tournaments",
   "main": "main.js",
-  "homepage": "https://github.com/kclevenger84/Flexible-Map-Ban-Overlay",
+  "homepage": "./",
   "scripts": {
     "start": "electron .",
     "dev": "electron . --dev",
@@ -17,13 +17,12 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "build": {
-    "appId": "com.Clevenger.flexible-map-ban",
+    "appId": "com.clevenger.flexible-map-ban",
     "productName": "Flexible Map Ban Overlay",
     "directories": {
       "output": "dist"
     },
     "files": [
-      "package.json",
       "main.js",
       "controller.html",
       "overlay.html",
@@ -38,16 +37,62 @@
       }
     ],
     "win": {
-      "target": "nsis",
-      "icon": "assets/icon.ico"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
     },
-    "artifactName": "${productName}-${version}-${arch}.${ext}"
-  },
-  "nsis": {
-    "oneClick": false,
-    "allowToChangeInstallationDirectory": true,
-    "createDesktopShortcut": true,
-    "createStartMenuShortcut": true
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.games"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png",
+      "category": "Game"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
   },
   "devDependencies": {
     "electron": "^28.3.3",
@@ -65,12 +110,5 @@
     "streaming"
   ],
   "author": "Kevin Clevenger with contributions from Antonia Lucas",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kclevenger84/Valorant-Map-Ban-Overlay.git"
-  },
-  "bugs": {
-    "url": "https://github.com/kclevenger84/Valorant-Map-Ban-Overlay/issues"
-  }
+  "license": "MIT"
 }

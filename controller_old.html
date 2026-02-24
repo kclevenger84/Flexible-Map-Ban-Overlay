@@ -54,12 +54,14 @@
       <option value="flashpoint">Flashpoint</option>
     </select>
   </div>
-
   <div id="hero-bans" style="display: flex; justify-content: center; gap: 40px; margin-bottom: 20px;">
-    <div id="teamA-hero-ban" class="hero-ban-card"></div>
-    <div id="teamB-hero-ban" class="hero-ban-card"></div>
+    <div id="teamA-hero-ban" class="hero-ban-card">
+      <!-- Placeholder content will be set by JS -->
+    </div>
+    <div id="teamB-hero-ban" class="hero-ban-card">
+      <!-- Placeholder content will be set by JS -->
+    </div>
   </div>
-
   <label>
     Team A Name:
     <input type="text" id="teamA" value="Team A">
@@ -102,32 +104,28 @@
     <button onclick="sendSide(getSelectedMap(), 'attack', 'teamB')">Attack (Team B)</button>
     <button onclick="sendSide(getSelectedMap(), 'defend', 'teamB')">Defend (Team B)</button>
   </div>
-
-  <!-- Hero ban section: only visible when Overwatch 2 is selected -->
-  <div id="heroBanSection" style="display:none;">
-    <div>
-      <label>Team A Hero Ban:</label>
-      <select id="heroBanA"></select>
-      <button onclick="banHero('teamA')">Ban (Team A)</button>
-    </div>
-    <div>
-      <label>Team B Hero Ban:</label>
-      <select id="heroBanB"></select>
-      <button onclick="banHero('teamB')">Ban (Team B)</button>
-    </div>
+  <div>
+    <label>Team A Hero Ban:</label>
+    <select id="heroBanA"></select>
+    <button onclick="banHero('teamA')">Ban (Team A)</button>
   </div>
-
+  <div>
+    <label>Team B Hero Ban:</label>
+    <select id="heroBanB"></select>
+    <button onclick="banHero('teamB')">Ban (Team B)</button>
+  </div>
   <div>
     <label></label>
     <button onclick="resetAll()">Reset</button>
   </div>
   <div>
     <label>Need Help?</label>
-    <a href="https://github.com/kclevenger84/Flexible-Map-Ban-Overlay/blob/main/README.md" target="_blank">Click here
+    <a href="https://github.com/KnoxGameTeacher/Flexible-Map-Ban-Overlay/blob/main/README.md" target="_blank">Click here
       for the Read Me</a>
   </div>
 
   <script>
+    // Map pools for All three games
     const valorantMaps = ["Ascent", "Bind", "Haven", "Icebox", "Lotus", "Split", "Sunset"];
     const ow2Maps = {
       control: ["Antarctic Peninsula", "Busan", "Ilios", "Lijiang Tower", "Nepal", "Oasis", "Samoa"],
@@ -153,7 +151,6 @@
     let remainingMaps = new Set(valorantMaps);
     let remainingHeroesA = new Set(ow2Heroes);
     let remainingHeroesB = new Set(ow2Heroes);
-
     const socket = new WebSocket("ws://localhost:3000");
 
     socket.addEventListener("open", () => {
@@ -172,11 +169,6 @@
     const gameSelect = document.getElementById("gameSelect");
     const ow2CategoryDiv = document.getElementById("ow2CategoryDiv");
     const ow2CategorySelect = document.getElementById("ow2CategorySelect");
-
-    function updateHeroBanVisibility() {
-      document.getElementById("heroBanSection").style.display =
-        currentGame === "overwatch2" ? "block" : "none";
-    }
 
     function populateHeroDropdowns() {
       const heroBanA = document.getElementById("heroBanA");
@@ -210,8 +202,10 @@
 
     function banHero(teamKey) {
       const hero = document.getElementById(teamKey === "teamA" ? "heroBanA" : "heroBanB").value;
-      const teamName = document.getElementById(teamKey).value;
+      const teamName = document.getElementById(teamKey).value; // If you have a team name input
       socket.send(JSON.stringify({ action: "heroBan", team: teamKey, hero, teamName, game: currentGame }));
+
+      // Remove the hero from both sets so neither team can ban it again
       remainingHeroesA.delete(hero);
       remainingHeroesB.delete(hero);
       populateHeroDropdowns();
@@ -221,13 +215,14 @@
       if (currentGame === "valorant") {
         remainingMaps = new Set(valorantMaps);
       } else if (currentGame === "counterstrike2") {
-        remainingMaps = new Set(cs2Maps);
+        remainingMaps = new Set(cs2Maps)
       } else {
         remainingMaps = new Set(ow2Maps[currentCategory]);
       }
       updateDropdown();
     }
 
+    // Show/hide OW2 category selector and update map pool on game change
     gameSelect.addEventListener("change", function () {
       currentGame = gameSelect.value;
       if (currentGame === "overwatch2") {
@@ -237,10 +232,11 @@
         ow2CategoryDiv.style.display = "none";
       }
       setMapPool();
-      updateHeroBanVisibility();
+      // Notify overlay of game/category change
       socket.send(JSON.stringify({ action: "switch", game: currentGame, category: currentCategory }));
     });
 
+    // Update map pool when OW2 category changes
     ow2CategorySelect.addEventListener("change", function () {
       currentCategory = ow2CategorySelect.value;
       setMapPool();
@@ -248,7 +244,6 @@
     });
 
     updateDropdown();
-    updateHeroBanVisibility();
 
     function getSelectedMap() {
       return mapSelect.value;
@@ -268,21 +263,26 @@
 
     function sendSide(map, side, teamKey) {
       const team = document.getElementById(teamKey).value;
+      // Do NOT remove the map here!
       const message = { action: "side", map, team, side, game: currentGame, category: currentCategory };
       socket.send(JSON.stringify(message));
       console.log("Sending side:", message);
     }
 
     function resetAll() {
+      // Reset Teams and colors
       document.getElementById("teamA").value = "Team A";
       document.getElementById("teamB").value = "Team B";
       document.getElementById("colorA").value = "#ff0000";
       document.getElementById("colorB").value = "#0000ff";
+
+      // Reset Maps
       setMapPool();
+      // Reset Heroes
       remainingHeroesA = new Set(ow2Heroes);
       remainingHeroesB = new Set(ow2Heroes);
       populateHeroDropdowns();
-      updateHeroBanVisibility();
+      // Notify overlay to reset
       socket.send(JSON.stringify({ action: "reset", game: currentGame, category: currentCategory }));
       console.log("Sending reset");
     }
