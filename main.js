@@ -22,15 +22,13 @@ const getResourcePath = (relativePath) => {
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
-        width: 600,
+        width: 500,
         height: 750,
         webPreferences: {
-            //nodeIntegration: true,
-            //contextIsolation: false,
-            preload: path.join(__dirname, 'preload.js'), // Use preload script for security
+            nodeIntegration: true,
+            contextIsolation: false,
         },
     });
-    mainWindow.loadFile('index.html');
 
     const controllerPath = isDev
         ? path.join(__dirname, 'controller.html')
@@ -61,12 +59,8 @@ const createServer = () => {
             filePath = path.join(appDir, "controller.html");
         } else if (req.url === "/overlay.html") {
             filePath = path.join(appDir, "overlay.html");
-        } else if (req.url === "/overlay_full.html") {
-            filePath = path.join(appDir, "overlay_full.html");
         } else if (req.url.startsWith('/style.css')) {
             filePath = path.join(appDir, "style.css");
-        } else if (req.url.startsWith('/style2.css')) {
-            filePath = path.join(appDir, '/style2.css');
         } else if (req.url.startsWith('/images/')) {
             // Try both locations for images
             const imagePath1 = path.join(appDir, req.url);
@@ -150,5 +144,5 @@ app.on('before-quit', () => {
 
 // Handle app protocol for better packaged app support
 if (!isDev) {
-    app.setAsDefaultProtocolClient('valorant-map-ban');
+    app.setAsDefaultProtocolClient('flexible-map-ban');
 }
