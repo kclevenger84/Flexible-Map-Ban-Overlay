@@ -14,7 +14,9 @@
     "build:linux": "electron-builder --linux",
     "dist": "electron-builder --publish=never",
     "pack": "electron-builder --dir",
-    "postinstall": "electron-builder install-app-deps"
+    "postinstall": "electron-builder install-app-deps",
+    "app:dist": "electron-builder",
+    "app:dir": "electron-builder --dir"
   },
   "build": {
     "appId": "com.clevenger.flexible-map-ban",
@@ -26,6 +28,7 @@
       "main.js",
       "controller.html",
       "overlay.html",
+      "overlay2.html",
       "style.css",
       "images/**/*",
       "node_modules/**/*"
