@@ -1,0 +1,25 @@
+{
+    "appId": "com.kclevenger.flexible-map-ban",
+    "productName": "Flexible Map Ban Overlay",
+    "directories": {
+        "output": "dist"
+    },
+    "files": [
+        "main.js",
+        "controller.html",
+        "overlay.html",
+        "style.css",
+        "images/**/*",
+        "node_modules/**/*"
+    ],
+    "win": {
+        "target": "nsis",
+        "arch": "x64"
+    },
+    "nsis": {
+        "oneClick": false,
+        "createDesktopShortcut": true,
+        "createStartMenuShortcut": true
+    },
+    "forceCodeSigning": false
+}

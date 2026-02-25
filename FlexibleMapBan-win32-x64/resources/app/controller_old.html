@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Map Ban Controller</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      color: black;
+      padding: 20px;
+    }
+
+    .map-controls {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+
+    button,
+    select {
+      margin-left: 5px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      padding-top: 10px;
+    }
+
+    button {
+      width: 200px;
+    }
+  </style>
+</head>
+
+<body style="background-color: dimgrey;">
+  <h1>Map Ban Controller</h1>
+
+  <label for="gameSelect">Select Game:</label>
+  <select id="gameSelect">
+    <option value="valorant">Valorant</option>
+    <option value="overwatch2">Overwatch 2</option>
+    <option value="counterstrike2">Counter Strike 2</option>
+  </select>
+
+  <div id="ow2CategoryDiv" style="display:none;">
+    <label for="ow2CategorySelect">Select Overwatch 2 Map Type:</label>
+    <select id="ow2CategorySelect">
+      <option value="control">Control</option>
+      <option value="escort">Escort</option>
+      <option value="hybrid">Hybrid</option>
+      <option value="push">Push</option>
+      <option value="flashpoint">Flashpoint</option>
+    </select>
+  </div>
+  <div id="hero-bans" style="display: flex; justify-content: center; gap: 40px; margin-bottom: 20px;">
+    <div id="teamA-hero-ban" class="hero-ban-card">
+      <!-- Placeholder content will be set by JS -->
+    </div>
+    <div id="teamB-hero-ban" class="hero-ban-card">
+      <!-- Placeholder content will be set by JS -->
+    </div>
+  </div>
+  <label>
+    Team A Name:
+    <input type="text" id="teamA" value="Team A">
+  </label>
+  <label>
+    Team B Name:
+    <input type="text" id="teamB" value="Team B">
+  </label>
+
+  <label>
+    Team A Color:
+    <input type="color" id="colorA" value="#ff0000">
+  </label>
+  <label>
+    Team B Color:
+    <input type="color" id="colorB" value="#000000">
+  </label>
+
+  <div>
+    <label for="mapSelect">Select Map:</label>
+    <select id="mapSelect"></select>
+  </div>
+  <div>
+    <label>Ban Choice</label>
+    <button onclick="sendAction('ban', getSelectedMap(), 'teamA')">Ban (Team A)</button>
+    <button onclick="sendAction('ban', getSelectedMap(), 'teamB')">Ban (Team B)</button>
+  </div>
+  <div>
+    <label>Team Map Pick</label>
+    <button onclick="sendAction('pick', getSelectedMap(), 'teamA')">Pick (Team A)</button>
+    <button onclick="sendAction('pick', getSelectedMap(), 'teamB')">Pick (Team B)</button>
+  </div>
+  <div>
+    <label>Team A side select</label>
+    <button onclick="sendSide(getSelectedMap(), 'attack', 'teamA')">Attack (Team A)</button>
+    <button onclick="sendSide(getSelectedMap(), 'defend', 'teamA')">Defend (Team A)</button>
+  </div>
+  <div>
+    <label>Team B side select</label>
+    <button onclick="sendSide(getSelectedMap(), 'attack', 'teamB')">Attack (Team B)</button>
+    <button onclick="sendSide(getSelectedMap(), 'defend', 'teamB')">Defend (Team B)</button>
+  </div>
+  <div>
+    <label>Team A Hero Ban:</label>
+    <select id="heroBanA"></select>
+    <button onclick="banHero('teamA')">Ban (Team A)</button>
+  </div>
+  <div>
+    <label>Team B Hero Ban:</label>
+    <select id="heroBanB"></select>
+    <button onclick="banHero('teamB')">Ban (Team B)</button>
+  </div>
+  <div>
+    <label></label>
+    <button onclick="resetAll()">Reset</button>
+  </div>
+  <div>
+    <label>Need Help?</label>
+    <a href="https://github.com/KnoxGameTeacher/Flexible-Map-Ban-Overlay/blob/main/README.md" target="_blank">Click here
+      for the Read Me</a>
+  </div>
+
+  <script>
+    // Map pools for All three games
+    const valorantMaps = ["Ascent", "Bind", "Haven", "Icebox", "Lotus", "Split", "Sunset"];
+    const ow2Maps = {
+      control: ["Antarctic Peninsula", "Busan", "Ilios", "Lijiang Tower", "Nepal", "Oasis", "Samoa"],
+      escort: ["Circuit Royal", "Dorado", "Havana", "Junkertown", "Rialto", "Route 66", "Shambali Monastery", "Gibraltar"],
+      hybrid: ["Blizzard World", "Eichenwalde", "Hollywood", "King's Row", "Midtown", "Numbani", "Paraiso"],
+      push: ["Colosseo", "Esperanca", "New Queen Street", "Runasapi"],
+      flashpoint: ["Aatlis", "Suravasa", "New Junk City"]
+    };
+
+    const ow2Heroes = [
+      "Ana", "Anran", "Ashe", "Baptiste", "Bastion", "Brigitte", "Cassidy", "DVa", "Domina",
+      "Doomfist", "Echo", "Emre", "Genji", "Hanzo", "Illari", "Junker Queen", "JetpackCat",
+      "Junkrat", "Kiriko", "Lifeweaver", "Lucio", "Mauga", "Mei", "Mercy", "Minzuki", "Moira",
+      "Orisa", "Pharah", "Ramattra", "Reaper", "Reinhardt", "Roadhog", "Sigma", "Sojourn",
+      "Soldier76", "Sombra", "Symmetra", "Torbjorn", "Tracer", "Vendetta", "Venture", "Widowmaker",
+      "Winston", "Wrecking Ball", "Zarya", "Zenyatta"
+    ];
+
+    const cs2Maps = ["Ancient", "Anubis", "Dust II", "Inferno", "Mirage", "Nuke", "Overpass"];
+
+    let currentGame = "valorant";
+    let currentCategory = "control";
+    let remainingMaps = new Set(valorantMaps);
+    let remainingHeroesA = new Set(ow2Heroes);
+    let remainingHeroesB = new Set(ow2Heroes);
+    const socket = new WebSocket("ws://localhost:3000");
+
+    socket.addEventListener("open", () => {
+      console.log("WebSocket connection established");
+    });
+
+    socket.addEventListener("error", (error) => {
+      console.error("WebSocket error:", error);
+    });
+
+    socket.addEventListener("close", () => {
+      console.log("WebSocket connection closed");
+    });
+
+    const mapSelect = document.getElementById("mapSelect");
+    const gameSelect = document.getElementById("gameSelect");
+    const ow2CategoryDiv = document.getElementById("ow2CategoryDiv");
+    const ow2CategorySelect = document.getElementById("ow2CategorySelect");
+
+    function populateHeroDropdowns() {
+      const heroBanA = document.getElementById("heroBanA");
+      const heroBanB = document.getElementById("heroBanB");
+      heroBanA.innerHTML = "";
+      heroBanB.innerHTML = "";
+      remainingHeroesA.forEach(hero => {
+        const optionA = document.createElement("option");
+        optionA.value = hero;
+        optionA.textContent = hero;
+        heroBanA.appendChild(optionA);
+      });
+      remainingHeroesB.forEach(hero => {
+        const optionB = document.createElement("option");
+        optionB.value = hero;
+        optionB.textContent = hero;
+        heroBanB.appendChild(optionB);
+      });
+    }
+    populateHeroDropdowns();
+
+    function updateDropdown() {
+      mapSelect.innerHTML = "";
+      remainingMaps.forEach(map => {
+        const option = document.createElement("option");
+        option.value = map;
+        option.textContent = map;
+        mapSelect.appendChild(option);
+      });
+    }
+
+    function banHero(teamKey) {
+      const hero = document.getElementById(teamKey === "teamA" ? "heroBanA" : "heroBanB").value;
+      const teamName = document.getElementById(teamKey).value; // If you have a team name input
+      socket.send(JSON.stringify({ action: "heroBan", team: teamKey, hero, teamName, game: currentGame }));
+
+      // Remove the hero from both sets so neither team can ban it again
+      remainingHeroesA.delete(hero);
+      remainingHeroesB.delete(hero);
+      populateHeroDropdowns();
+    }
+
+    function setMapPool() {
+      if (currentGame === "valorant") {
+        remainingMaps = new Set(valorantMaps);
+      } else if (currentGame === "counterstrike2") {
+        remainingMaps = new Set(cs2Maps)
+      } else {
+        remainingMaps = new Set(ow2Maps[currentCategory]);
+      }
+      updateDropdown();
+    }
+
+    // Show/hide OW2 category selector and update map pool on game change
+    gameSelect.addEventListener("change", function () {
+      currentGame = gameSelect.value;
+      if (currentGame === "overwatch2") {
+        ow2CategoryDiv.style.display = "block";
+        currentCategory = ow2CategorySelect.value;
+      } else {
+        ow2CategoryDiv.style.display = "none";
+      }
+      setMapPool();
+      // Notify overlay of game/category change
+      socket.send(JSON.stringify({ action: "switch", game: currentGame, category: currentCategory }));
+    });
+
+    // Update map pool when OW2 category changes
+    ow2CategorySelect.addEventListener("change", function () {
+      currentCategory = ow2CategorySelect.value;
+      setMapPool();
+      socket.send(JSON.stringify({ action: "switch", game: currentGame, category: currentCategory }));
+    });
+
+    updateDropdown();
+
+    function getSelectedMap() {
+      return mapSelect.value;
+    }
+
+    function sendAction(action, map, teamKey) {
+      const team = document.getElementById(teamKey).value;
+      const color = document.getElementById(teamKey === "teamA" ? "colorA" : "colorB").value;
+      if (action === "ban") {
+        remainingMaps.delete(map);
+        updateDropdown();
+      }
+      const message = { action, map, team, color, game: currentGame, category: currentCategory };
+      socket.send(JSON.stringify(message));
+      console.log("Sending action:", message);
+    }
+
+    function sendSide(map, side, teamKey) {
+      const team = document.getElementById(teamKey).value;
+      // Do NOT remove the map here!
+      const message = { action: "side", map, team, side, game: currentGame, category: currentCategory };
+      socket.send(JSON.stringify(message));
+      console.log("Sending side:", message);
+    }
+
+    function resetAll() {
+      // Reset Teams and colors
+      document.getElementById("teamA").value = "Team A";
+      document.getElementById("teamB").value = "Team B";
+      document.getElementById("colorA").value = "#ff0000";
+      document.getElementById("colorB").value = "#0000ff";
+
+      // Reset Maps
+      setMapPool();
+      // Reset Heroes
+      remainingHeroesA = new Set(ow2Heroes);
+      remainingHeroesB = new Set(ow2Heroes);
+      populateHeroDropdowns();
+      // Notify overlay to reset
+      socket.send(JSON.stringify({ action: "reset", game: currentGame, category: currentCategory }));
+      console.log("Sending reset");
+    }
+  </script>
+</body>
+
+</html>

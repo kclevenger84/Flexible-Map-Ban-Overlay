@@ -1,0 +1,117 @@
+{
+  "name": "flexible-map-ban-overlay",
+  "productName": "Flexible Map Ban Overlay",
+  "version": "0.1.0",
+  "description": "A map ban/pick overlay for Valorant and Overwatch tournaments",
+  "main": "main.js",
+  "homepage": "./",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
+    "dist": "electron-builder --publish=never",
+    "pack": "electron-builder --dir",
+    "postinstall": "electron-builder install-app-deps",
+    "app:dist": "electron-builder",
+    "app:dir": "electron-builder --dir"
+  },
+  "build": {
+    "appId": "com.clevenger.flexible-map-ban",
+    "productName": "Flexible Map Ban Overlay",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "controller.html",
+      "overlay.html",
+      "overlay2.html",
+      "style.css",
+      "images/**/*",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "images",
+        "to": "images"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.games"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png",
+      "category": "Game"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^24.13.3",
+    "electron-packager": "^17.1.2"
+  },
+  "dependencies": {
+    "ws": "^8.19.0"
+  },
+  "keywords": [
+    "valorant",
+    "overwatch",
+    "esports",
+    "overlay",
+    "streaming"
+  ],
+  "author": "Kevin Clevenger with contributions from Antonia Lucas",
+  "license": "MIT"
+}

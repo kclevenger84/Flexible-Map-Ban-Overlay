@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Map Pick/Ban Overlay</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .overlay-grid {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      padding: 20px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="hero-bans-section" style="display: none;">
+    <div style="text-align: center; font-size: 1.3em; font-weight: bold; margin-bottom: 8px;">Hero Bans</div>
+    <div id="hero-bans" style="display: flex; justify-content: center; gap: 40px; margin-bottom: 20px;">
+      <div id="teamA-hero-ban" class="hero-ban-card"></div>
+      <div id="teamB-hero-ban" class="hero-ban-card"></div>
+    </div>
+  </div>
+
+  <div style="text-align: center; font-size: 1.3em; font-weight: bold; margin-bottom: 8px;">Map Bans</div>
+  <div class="overlay-grid" id="map-grid"></div>
+
+  <script>
+    // Map pools for both games
+    const valorantMaps = ["Ascent", "Bind", "Haven", "Icebox", "Lotus", "Split", "Sunset"];
+    const ow2Maps = {
+      control: ["Antarctic Peninsula", "Busan", "Ilios", "Lijiang Tower", "Nepal", "Oasis", "Samoa"],
+      escort: ["Circuit Royal", "Dorado", "Havana", "Junkertown", "Rialto", "Route 66", "Shambali Monastery", "Gibraltar"],
+      hybrid: ["Blizzard World", "Eichenwalde", "Hollywood", "King's Row", "Midtown", "Numbani", "Paraiso"],
+      push: ["Colosseo", "Esperanca", "New Queen Street", "Runasapi"],
+      flashpoint: ["Aatlis", "Suravasa", "New Junk City"]
+    };
+
+    const ow2Heroes = [
+      "Ana", "Anran", "Ashe", "Baptiste", "Bastion", "Brigitte", "Cassidy", "DVa", "Domina",
+      "Doomfist", "Echo", "Emre", "Genji", "Hanzo", "Illari", "Junker Queen", "JetpackCat",
+      "Junkrat", "Kiriko", "Lifeweaver", "Lucio", "Mauga", "Mei", "Mercy", "Minzuki", "Moira",
+      "Orisa", "Pharah", "Ramattra", "Reaper", "Reinhardt", "Roadhog", "Sigma", "Sojourn",
+      "Soldier76", "Sombra", "Symmetra", "Torbjorn", "Tracer", "Vendetta", "Venture", "Widowmaker",
+      "Winston", "Wrecking Ball", "Zarya", "Zenyatta"
+    ];
+
+    const cs2Maps = ["Ancient", "Anubis", "Dust II", "Inferno", "Mirage", "Nuke", "Overpass"];
+
+    let currentGame = "valorant";
+    let currentCategory = "control";
+
+    const mapGrid = document.getElementById("map-grid");
+
+    function renderMapGrid(game, category) {
+      console.log("renderMapGrid called with:", game, category);
+      mapGrid.innerHTML = "";
+      let mapsToShow = [];
+      if (game === "valorant") {
+        mapsToShow = valorantMaps;
+      } else if (game === "counterstrike2") {
+        mapsToShow = cs2Maps
+      } else if (game === "overwatch2") {
+        mapsToShow = ow2Maps[category] || [];
+      }
+
+      console.log("mapsToShow:", mapsToShow);
+      mapsToShow.forEach((map) => {
+        const card = document.createElement("div");
+        card.className = "map-card";
+        card.id = `map-${map}`;
+        card.dataset.color = "";
+
+        const encodedMapName = encodeURIComponent(map);
+
+        card.innerHTML = `
+        <div class="label">${map}</div>
+        <img src="images/maps/${encodedMapName}.jpg" alt="${map}">
+        <div class="ban-label" id="${map}-ban"></div>
+        <div class="pick-label" id="${map}-pick"></div>
+        <div class="side-label" id="${map}-side"></div>
+      `;
+
+        mapGrid.appendChild(card);
+      });
+    }
+    // Initial render
+    renderMapGrid(currentGame, currentCategory);
+
+    function updateHeroBansVisibility() {
+      const heroBansSection = document.getElementById("hero-bans-section");
+      if (currentGame === "overwatch2") {
+        heroBansSection.style.display = "";
+      } else {
+        heroBansSection.style.display = "none";
+      }
+    }
+    updateHeroBansVisibility();
+
+    const socket = new WebSocket("ws://localhost:3000");
+
+    socket.addEventListener("open", () => {
+      console.log("Overlay WebSocket connection established");
+    });
+
+    socket.addEventListener("error", (error) => {
+      console.error("Overlay WebSocket error:", error);
+    });
+
+    socket.addEventListener("close", () => {
+      console.log("Overlay WebSocket connection closed");
+    });
+
+    function setHeroBan(team, hero, teamName) {
+      const banDiv = document.getElementById(`${team}-hero-ban`);
+      if (hero) {
+        banDiv.innerHTML = `
+        <img src="images/heroes/${encodeURIComponent(hero)}.png" alt="${hero}">
+        <div class="hero-ban-name">${hero}</div>
+        <div class="hero-ban-team">${teamName ? teamName + " BANNED" : ""}</div>
+      `;
+        banDiv.style.borderStyle = "solid";
+      } else {
+        banDiv.innerHTML = `<div class="hero-ban-name"></div><div class="hero-ban-team"></div>`;
+        banDiv.style.borderStyle = "dashed";
+      }
+    }
+
+    // On load, show empty placeholders
+    setHeroBan("teamA", null);
+    setHeroBan("teamB", null);
+
+    socket.addEventListener("message", async (event) => {
+      let rawData = event.data;
+      if (rawData instanceof Blob) {
+        rawData = await rawData.text();
+      }
+
+      const data = JSON.parse(rawData);
+      console.log("Received data:", data);
+
+      // Handle hero bans
+      if (data.action === "heroBan") {
+        setHeroBan(data.team, data.hero, data.teamName || data.team);
+        return;
+      }
+
+      if (data.action === "side") {
+        const mapCard = document.getElementById(`map-${data.map}`);
+        if (mapCard) {
+          const sideLabel = document.getElementById(`${data.map}-side`);
+          if (sideLabel) {
+            sideLabel.textContent = `${data.team} → ${data.side.toUpperCase()}`;
+          }
+        }
+        return;
+      }
+
+      // Handle game/category switch and reset
+      if (data.action === "switch" || data.action === "reset") {
+        currentGame = data.game || "valorant";
+        currentCategory = data.category || "control";
+        renderMapGrid(currentGame, currentCategory);
+        setHeroBan("teamA", null);
+        setHeroBan("teamB", null);
+        updateHeroBansVisibility();
+        return;
+      }
+
+      if (data.action === "ban") {
+        const mapCard = document.getElementById(`map-${data.map}`);
+        if (mapCard) {
+          mapCard.classList.add("banned");
+          mapCard.style.setProperty('--team-color', data.color || '#c00');
+          const banLabel = document.getElementById(`${data.map}-ban`);
+          if (banLabel) {
+            banLabel.textContent = `${data.team} BANNED`;
+          }
+        }
+        return;
+      }
+
+      // Handle map pick
+      if (data.action === "pick") {
+        const mapCard = document.getElementById(`map-${data.map}`);
+        if (mapCard) {
+          mapCard.classList.add("picked");
+          mapCard.style.setProperty('--team-color', data.color || '#000');
+          const pickLabel = document.getElementById(`${data.map}-pick`);
+          if (pickLabel) {
+            pickLabel.textContent = `${data.team} PICKED`;
+          }
+        }
+        return;
+      }
+
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,116 @@
+{
+  "name": "flexible-map-ban-overlay",
+  "productName": "Flexible Map Ban Overlay",
+  "version": "0.0.1",
+  "description": "A map ban/pick overlay for Valorant and Overwatch 2 tournaments",
+  "main": "main.js",
+  "homepage": "./",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
+    "dist": "electron-builder --publish=never",
+    "pack": "electron-builder --dir",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "build": {
+    "appId": "com.kclevenger84.flexible-map-ban",
+    "productName": "Flexible Map Ban Overlay",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "controller.html",
+      "overlay.html",
+      "style.css",
+      "images/**/*",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "images",
+        "to": "images"
+      }
+    ],
+    "forceCodeSigning": false,
+    "win": {
+      "target": [
+        {
+          "target": "squirrel",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "artifactName": "${productName}-${version}-${arch}.${ext}",
+      "sign": null,
+      "forceCodeSigning": false
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.games"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png",
+      "category": "Game"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Flexible Map Ban Overlay",
+      "runAfterFinish": true,
+      "menuCategory": "Games",
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "warningsAsErrors": false,
+      "deleteAppDataOnUninstall": true
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
+  },
+  "keywords": [
+    "valorant",
+    "overwatch",
+    "esports",
+    "overlay",
+    "streaming"
+  ],
+  "author": "Kevin Clevenger with contributions from Antonia Lucas",
+  "license": "MIT"
+}

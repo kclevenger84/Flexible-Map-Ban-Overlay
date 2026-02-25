@@ -1,0 +1,99 @@
+body {
+  margin: 0;
+  background-color: transparent;
+  font-family: sans-serif;
+  color: white;
+}
+
+.overlay-grid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  position: fixed;
+  width: 100%;
+  /*background-color: rgba(0, 0, 0, 0.5);*/
+}
+
+.hero-ban-card {
+  width: 120px;
+  height: 180px;
+  border: 2px dashed #888;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background: #222;
+  margin: 0 10px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.hero-ban-card img {
+  width: 80px;
+  height: 80px;
+  margin-top: 16px;
+  object-fit: contain;
+}
+
+.hero-ban-name {
+  margin-top: 12px;
+  color: #fff;
+  font-size: 1.1em;
+  text-align: center;
+  min-height: 1.2em;
+}
+
+.hero-ban-team {
+  margin-top: 6px;
+  color: #ffffff;
+  font-size: 0.95em;
+  text-align: center;
+  min-height: 1.1em;
+}
+
+.map-card {
+  position: relative;
+  width: 160px;
+  border: 4px solid white;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.map-card img {
+  width: 100%;
+  display: block;
+}
+
+.label {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 5px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.banned {
+  opacity: 0.5;
+  filter: grayscale(100%);
+  border: 3px solid var(--team-color, #c00);
+}
+
+.picked {
+  border: 3px solid var(--team-color, rgb(0, 0, 0));
+}
+
+.ban-label,
+.pick-label,
+.side-label {
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  text-align: center;
+}
+
+.map-card[data-color] {
+  border-color: var(--team-color, white) !important;
+}
