@@ -92,12 +92,12 @@
     <button onclick="sendAction('pick', getSelectedMap(), 'teamA')">Pick (Team A)</button>
     <button onclick="sendAction('pick', getSelectedMap(), 'teamB')">Pick (Team B)</button>
   </div>
-  <div id="sideSelectA">
+  <div>
     <label>Team A side select</label>
     <button onclick="sendSide(getSelectedMap(), 'attack', 'teamA')">Attack (Team A)</button>
     <button onclick="sendSide(getSelectedMap(), 'defend', 'teamA')">Defend (Team A)</button>
   </div>
-  <div id="sideSelectB">
+  <div>
     <label>Team B side select</label>
     <button onclick="sendSide(getSelectedMap(), 'attack', 'teamB')">Attack (Team B)</button>
     <button onclick="sendSide(getSelectedMap(), 'defend', 'teamB')">Defend (Team B)</button>
@@ -173,12 +173,6 @@
     const ow2CategoryDiv = document.getElementById("ow2CategoryDiv");
     const ow2CategorySelect = document.getElementById("ow2CategorySelect");
 
-    function updateSideSelectVisibility() {
-      const show = currentGame !== "counterstrike2";
-      document.getElementById("sideSelectA").style.display = show ? "block" : "none";
-      document.getElementById("sideSelectB").style.display = show ? "block" : "none";
-    }
-
     function updateHeroBanVisibility() {
       document.getElementById("heroBanSection").style.display =
         currentGame === "overwatch2" ? "block" : "none";
@@ -244,7 +238,6 @@
       }
       setMapPool();
       updateHeroBanVisibility();
-      updateSideSelectVisibility();
       socket.send(JSON.stringify({ action: "switch", game: currentGame, category: currentCategory }));
     });
 
@@ -256,7 +249,6 @@
 
     updateDropdown();
     updateHeroBanVisibility();
-    updateSideSelectVisibility();
 
     function getSelectedMap() {
       return mapSelect.value;
@@ -265,7 +257,7 @@
     function sendAction(action, map, teamKey) {
       const team = document.getElementById(teamKey).value;
       const color = document.getElementById(teamKey === "teamA" ? "colorA" : "colorB").value;
-      if (action === "ban" || action === "pick") {
+      if (action === "ban") {
         remainingMaps.delete(map);
         updateDropdown();
       }

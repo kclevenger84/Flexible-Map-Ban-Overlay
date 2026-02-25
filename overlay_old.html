@@ -4,135 +4,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Map Pick/Ban Overlay 2</title>
+  <title>Map Pick/Ban Overlay</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-    }
-
     .overlay-grid {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
       justify-content: center;
-    }
-
-    .map-card {
-      position: relative;
-      width: 200px;
-      height: 700px;
-      overflow: hidden;
-      border: 2px solid #555;
-      border-radius: 6px;
-      flex-shrink: 0;
-    }
-
-    .map-card img {
-      width: 200px;
-      height: 700px;
-      object-fit: cover;
-      display: block;
-    }
-
-    .map-card .label {
-      position: absolute;
-      top: 8px;
-      left: 0;
+      align-items: center;
+      gap: 10px;
+      padding: 20px;
+      position: fixed;
+      bottom: 0;
       width: 100%;
-      text-align: center;
-      font-weight: bold;
-      font-size: 1.5em;
-      color: #fff;
-      text-shadow: 1px 1px 3px #000;
-      z-index: 2;
-    }
-
-    .map-card .ban-label,
-    .map-card .pick-label,
-    .map-card .side-label {
-      position: absolute;
-      left: 0;
-      width: 100%;
-      text-align: center;
-      font-weight: bold;
-      font-size: 0.85em;
-      color: #fff;
-      text-shadow: 1px 1px 3px #000;
-      z-index: 2;
-    }
-
-    .map-card .ban-label {
-      bottom: 60px;
-    }
-
-    .map-card .pick-label {
-      bottom: 38px;
-    }
-
-    .map-card .side-label {
-      bottom: 16px;
-    }
-
-    .map-card.banned::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: rgba(180, 0, 0, 0.55);
-      z-index: 1;
-    }
-
-    .map-card.banned .ban-label,
-    .map-card.banned .label {
-      z-index: 3;
-    }
-
-    .map-card.picked::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: color-mix(in srgb, var(--team-color, #00a000) 45%, transparent);
-      z-index: 1;
-    }
-
-    .map-card.picked .pick-label,
-    .map-card.picked .label {
-      z-index: 3;
-    }
-
-    .hero-ban-card {
-      border: 2px dashed #888;
-      border-radius: 6px;
-      padding: 8px;
-      min-width: 120px;
-      text-align: center;
-    }
-
-    .hero-ban-card img {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      display: block;
-      margin: 0 auto 4px;
-    }
-
-    .hero-ban-name {
-      font-weight: bold;
-      font-size: 0.9em;
-    }
-
-    .hero-ban-team {
-      font-size: 0.75em;
-      color: #c00;
     }
   </style>
 </head>
@@ -150,6 +33,7 @@
   <div class="overlay-grid" id="map-grid"></div>
 
   <script>
+    // Map pools for both games
     const valorantMaps = ["Ascent", "Bind", "Haven", "Icebox", "Lotus", "Split", "Sunset"];
     const ow2Maps = {
       control: ["Antarctic Peninsula", "Busan", "Ilios", "Lijiang Tower", "Nepal", "Oasis", "Samoa"],
@@ -182,7 +66,7 @@
       if (game === "valorant") {
         mapsToShow = valorantMaps;
       } else if (game === "counterstrike2") {
-        mapsToShow = cs2Maps;
+        mapsToShow = cs2Maps
       } else if (game === "overwatch2") {
         mapsToShow = ow2Maps[category] || [];
       }
@@ -197,17 +81,17 @@
         const encodedMapName = encodeURIComponent(map);
 
         card.innerHTML = `
-          <div class="label">${map}</div>
-          <img src="images/maps/${encodedMapName}.jpg" alt="${map}">
-          <div class="ban-label" id="${map}-ban"></div>
-          <div class="pick-label" id="${map}-pick"></div>
-          <div class="side-label" id="${map}-side"></div>
-        `;
+        <div class="label">${map}</div>
+        <img src="images/maps/${encodedMapName}.jpg" alt="${map}">
+        <div class="ban-label" id="${map}-ban"></div>
+        <div class="pick-label" id="${map}-pick"></div>
+        <div class="side-label" id="${map}-side"></div>
+      `;
 
         mapGrid.appendChild(card);
       });
     }
-
+    // Initial render
     renderMapGrid(currentGame, currentCategory);
 
     function updateHeroBansVisibility() {
@@ -238,10 +122,10 @@
       const banDiv = document.getElementById(`${team}-hero-ban`);
       if (hero) {
         banDiv.innerHTML = `
-          <img src="images/heroes/${encodeURIComponent(hero)}.png" alt="${hero}">
-          <div class="hero-ban-name">${hero}</div>
-          <div class="hero-ban-team">${teamName ? teamName + " BANNED" : ""}</div>
-        `;
+        <img src="images/heroes/${encodeURIComponent(hero)}.png" alt="${hero}">
+        <div class="hero-ban-name">${hero}</div>
+        <div class="hero-ban-team">${teamName ? teamName + " BANNED" : ""}</div>
+      `;
         banDiv.style.borderStyle = "solid";
       } else {
         banDiv.innerHTML = `<div class="hero-ban-name"></div><div class="hero-ban-team"></div>`;
@@ -249,6 +133,7 @@
       }
     }
 
+    // On load, show empty placeholders
     setHeroBan("teamA", null);
     setHeroBan("teamB", null);
 
@@ -261,6 +146,7 @@
       const data = JSON.parse(rawData);
       console.log("Received data:", data);
 
+      // Handle hero bans
       if (data.action === "heroBan") {
         setHeroBan(data.team, data.hero, data.teamName || data.team);
         return;
@@ -277,6 +163,7 @@
         return;
       }
 
+      // Handle game/category switch and reset
       if (data.action === "switch" || data.action === "reset") {
         currentGame = data.game || "valorant";
         currentCategory = data.category || "control";
@@ -300,6 +187,7 @@
         return;
       }
 
+      // Handle map pick
       if (data.action === "pick") {
         const mapCard = document.getElementById(`map-${data.map}`);
         if (mapCard) {
@@ -312,6 +200,7 @@
         }
         return;
       }
+
     });
   </script>
 </body>
