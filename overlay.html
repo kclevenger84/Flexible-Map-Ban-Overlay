@@ -17,6 +17,57 @@
       bottom: 0;
       width: 100%;
     }
+
+    /* Make map card a positioning context for absolute labels */
+    .map-card {
+      position: relative;
+    }
+
+    /* Stack image so labels can sit on top of it */
+    .map-card img {
+      display: block;
+      width: 100%;
+    }
+
+    /* All labels: hidden by default, positioned over the image */
+    .ban-label,
+    .pick-label,
+    .side-label {
+      display: none;
+      position: absolute;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-weight: bold;
+      font-size: 13px;
+      color: #fff;
+      text-shadow: 1px 1px 3px #000;
+      padding: 5px 0;
+      z-index: 3;
+      box-sizing: border-box;
+    }
+
+    .ban-label  { bottom: 52px; }
+    .pick-label { bottom: 52px; }
+    .side-label { bottom: 28px; }
+
+    /* Picked: add a team-colored overlay on top of the image */
+    .map-card.picked::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: color-mix(in srgb, var(--team-color, #0080ff) 50%, transparent);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Keep pick/ban labels above the overlay tint */
+    .map-card.picked .pick-label,
+    .map-card.picked .side-label,
+    .map-card.banned .ban-label,
+    .map-card.banned .side-label {
+      z-index: 4;
+    }
   </style>
 </head>
 
@@ -158,6 +209,7 @@
           const sideLabel = document.getElementById(`${data.map}-side`);
           if (sideLabel) {
             sideLabel.textContent = `${data.team} → ${data.side.toUpperCase()}`;
+            sideLabel.style.display = "block";
           }
         }
         return;
@@ -182,6 +234,7 @@
           const banLabel = document.getElementById(`${data.map}-ban`);
           if (banLabel) {
             banLabel.textContent = `${data.team} BANNED`;
+            banLabel.style.display = "block";
           }
         }
         return;
@@ -192,10 +245,11 @@
         const mapCard = document.getElementById(`map-${data.map}`);
         if (mapCard) {
           mapCard.classList.add("picked");
-          mapCard.style.setProperty('--team-color', data.color || '#000');
+          mapCard.style.setProperty('--team-color', data.color || '#0080ff');
           const pickLabel = document.getElementById(`${data.map}-pick`);
           if (pickLabel) {
             pickLabel.textContent = `${data.team} PICKED`;
+            pickLabel.style.display = "block";
           }
         }
         return;
