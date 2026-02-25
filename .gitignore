@@ -7,13 +7,10 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
-<<<<<<< HEAD
 FlexibleMapBan-win32-x64/
 
 *.exe
 
-=======
->>>>>>> c22a0d49790cd384802aa7c236491001fa4b68bd
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
