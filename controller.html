@@ -272,6 +272,14 @@
       const message = { action, map, team, color, game: currentGame, category: currentCategory };
       socket.send(JSON.stringify(message));
       console.log("Sending action:", message);
+
+      if (remainingMaps.size === 1) {
+        const deciderMap = [...remainingMaps][0];
+        remainingMaps.delete(deciderMap);
+        updateDropdown();
+        socket.send(JSON.stringify({ action: "decider", map: deciderMap, game: currentGame, category: currentCategory }));
+        console.log("Sending decider:", deciderMap);
+      }
     }
 
     function sendSide(map, side, teamKey) {

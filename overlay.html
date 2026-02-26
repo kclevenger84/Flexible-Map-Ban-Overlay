@@ -47,9 +47,15 @@
       box-sizing: border-box;
     }
 
-    .ban-label  { bottom: 52px; }
-    .pick-label { bottom: 52px; }
+    .ban-label  { bottom: 52px; 
+    background: #999}
+    .pick-label { bottom: 52px; 
+    background: color-mix(in srgb, var(--team-color, #00a000) 100%, transparent);}
     .side-label { bottom: 28px; }
+
+    .map-card.picked {
+      box-shadow: 0 0 12px 4px var(--team-color, #0080ff);
+    }
 
     /* Picked: add a team-colored overlay on top of the image */
     .map-card.picked::after {
@@ -67,6 +73,37 @@
     .map-card.banned .ban-label,
     .map-card.banned .side-label {
       z-index: 4;
+    }
+
+    .map-card.decider {
+      border-color: gold !important;
+      box-shadow: 0 0 12px 4px gold;
+    }
+
+    .map-card.decider::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 215, 0, 0.35);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .decider-label {
+      display: none;
+      position: absolute;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-weight: bold;
+      font-size: 13px;
+      color: #fff;
+      background: rgba(255, 215, 0, 0.9);
+      padding: 5px 0;
+      bottom: 52px;
+      z-index: 4;
+      box-sizing: border-box;
+      letter-spacing: 0.05em;
     }
   </style>
 </head>
@@ -137,6 +174,7 @@
         <div class="ban-label" id="${map}-ban"></div>
         <div class="pick-label" id="${map}-pick"></div>
         <div class="side-label" id="${map}-side"></div>
+        <div class="decider-label" id="${map}-decider">DECIDER</div>
       `;
 
         mapGrid.appendChild(card);
@@ -200,6 +238,16 @@
       // Handle hero bans
       if (data.action === "heroBan") {
         setHeroBan(data.team, data.hero, data.teamName || data.team);
+        return;
+      }
+
+      if (data.action === "decider") {
+        const mapCard = document.getElementById(`map-${data.map}`);
+        if (mapCard) {
+          mapCard.classList.add("decider");
+          const deciderLabel = document.getElementById(`${data.map}-decider`);
+          if (deciderLabel) deciderLabel.style.display = "block";
+        }
         return;
       }
 

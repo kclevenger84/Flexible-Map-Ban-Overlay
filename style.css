@@ -63,6 +63,11 @@ body {
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
+.picked {
+  border: 3px solid var(--team-color, rgb(0, 0, 0));
+  box-shadow: 0 0 12px 4px var(--team-color, #0080ff);
+}
+
 .map-card img {
   width: 100%;
   display: block;
@@ -88,6 +93,13 @@ body {
 .ban-label,
 .pick-label,
 .side-label {
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  text-align: center;
+}
+
+.decider-label {
   color: white;
   font-weight: bold;
   font-size: 12px;

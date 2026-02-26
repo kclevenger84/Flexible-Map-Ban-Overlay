@@ -60,6 +60,7 @@
     .map-card .ban-label,
     .map-card .pick-label,
     .map-card .side-label {
+      display: none;
       position: absolute;
       left: 0;
       width: 100%;
@@ -67,16 +68,28 @@
       font-weight: bold;
       font-size: 0.85em;
       color: #fff;
+      padding: 5px 0;
       text-shadow: 1px 1px 3px #000;
-      z-index: 2;
+      z-index: 4;
+      box-sizing: border-box;
+      letter-spacing: 0.05em;
     }
 
+     
+      
+
     .map-card .ban-label {
-      bottom: 60px;
+      bottom: 38px;
+      background: #999;
     }
 
     .map-card .pick-label {
       bottom: 38px;
+      background: color-mix(in srgb, var(--team-color, #00a000) 100%, transparent);
+    }
+
+    .map-card.picked {
+      box-shadow: 0 0 12px 4px var(--team-color, #0080ff);
     }
 
     .map-card .side-label {
@@ -107,6 +120,37 @@
     .map-card.picked .pick-label,
     .map-card.picked .label {
       z-index: 3;
+    }
+
+    .map-card.decider {
+      border-color: gold !important;
+      box-shadow: 0 0 16px 6px gold;
+    }
+
+    .map-card.decider::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 215, 0, 0.35);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .decider-label {
+      display: none;
+      position: absolute;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-weight: bold;
+      font-size: 0.85em;
+      color: #fff;
+      background: rgba(255, 215, 0, 0.9);
+      padding: 5px 0;
+      bottom: 38px;
+      z-index: 4;
+      box-sizing: border-box;
+      letter-spacing: 0.05em;
     }
 
     .hero-ban-card {
@@ -202,6 +246,7 @@
           <div class="ban-label" id="${map}-ban"></div>
           <div class="pick-label" id="${map}-pick"></div>
           <div class="side-label" id="${map}-side"></div>
+          <div class="decider-label" id="${map}-decider">DECIDER</div>
         `;
 
         mapGrid.appendChild(card);
@@ -266,6 +311,16 @@
         return;
       }
 
+      if (data.action === "decider") {
+        const mapCard = document.getElementById(`map-${data.map}`);
+        if (mapCard) {
+          mapCard.classList.add("decider");
+          const deciderLabel = document.getElementById(`${data.map}-decider`);
+          if (deciderLabel) deciderLabel.style.display = "block";
+        }
+        return;
+      }
+
       if (data.action === "side") {
         const mapCard = document.getElementById(`map-${data.map}`);
         if (mapCard) {
@@ -295,6 +350,7 @@
           const banLabel = document.getElementById(`${data.map}-ban`);
           if (banLabel) {
             banLabel.textContent = `${data.team} BANNED`;
+            banLabel.style.display = "block";
           }
         }
         return;
@@ -304,10 +360,11 @@
         const mapCard = document.getElementById(`map-${data.map}`);
         if (mapCard) {
           mapCard.classList.add("picked");
-          mapCard.style.setProperty('--team-color', data.color || '#000');
+          mapCard.style.setProperty('--team-color', data.color || '#0080ff');
           const pickLabel = document.getElementById(`${data.map}-pick`);
           if (pickLabel) {
             pickLabel.textContent = `${data.team} PICKED`;
+            pickLabel.style.display = "block";
           }
         }
         return;
